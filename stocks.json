@@ -1,0 +1,26 @@
+[    
+    {
+        "name": "AAPL",
+        "price" : 189.99
+    },
+    {
+        "name": "NFLX",
+        "price" : 649.00
+    },
+    {
+        "name": "AMZN",
+        "price" : 182.15
+    },
+    {
+        "name": "GOOG",
+        "price" : 176.40
+    },
+    {
+        "name": "NVDA",
+        "price" : 1139.01
+    },
+    {
+        "name": "TSLA",
+        "price" : 176.75
+    }
+]
