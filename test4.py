@@ -19,7 +19,7 @@ class StockApp(tk.Tk):
         super().__init__()
 
         self.title("주식 정보")
-        self.geometry("600x400")
+        self.geometry("800x600")
 
         self.stocks = stocks
         self.player = player
@@ -41,6 +41,10 @@ class StockApp(tk.Tk):
         # 주식 정보 탭
         self.stock_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.stock_frame, text="주식 정보")
+
+        # 내가 산 주식 탭
+        self.my_stocks_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.my_stocks_frame, text="내가 산 주식")
 
         # 뉴스 탭
         self.news_frame = ttk.Frame(self.notebook)
@@ -84,21 +88,44 @@ class StockApp(tk.Tk):
 
         # 주식 가격
         self.stock_price_label = tk.Label(self.stock_frame, text="주식 가격", relief="solid", borderwidth=1)
-        self.stock_price_label.pack(side=tk.BOTTOM, anchor='w', padx=10, pady=5, fill=tk.X)
+        self.stock_price_label.pack(side=tk.TOP, anchor='w', padx=10, pady=5, fill=tk.X)
+
+        # 현재 남은 돈
+        self.money_label = tk.Label(self.stock_frame, text=f"남은 돈: {self.player['money']:.2f}", relief="solid", borderwidth=1)
+        self.money_label.pack(side=tk.TOP, anchor='w', padx=10, pady=5, fill=tk.X)
+
+        # 수량 레이블
+        self.quantity_label = tk.Label(self.stock_frame, text="수량", relief="solid", borderwidth=1)
+        self.quantity_label.pack(side=tk.LEFT, anchor='e', padx=10, pady=5)
 
         # 수량 조절 칸 (스핀 박스)
         self.quantity_var = tk.IntVar(value=1)
         self.quantity_spinbox = ttk.Spinbox(self.stock_frame, from_=1, to=999, textvariable=self.quantity_var, wrap=True)
-        self.quantity_spinbox.pack(side=tk.TOP, anchor='e', padx=10, pady=5)
+        self.quantity_spinbox.pack(side=tk.LEFT, anchor='e', padx=10, pady=5)
 
         # 구매 버튼
         self.buy_button = tk.Button(self.stock_frame, text="구매", command=self.confirm_purchase)
-        self.buy_button.pack(side=tk.TOP, anchor='e', padx=10, pady=5)
+        self.buy_button.pack(side=tk.LEFT, anchor='e', padx=10, pady=5)
+
+        # 판매 버튼
+        self.sell_button = tk.Button(self.stock_frame, text="판매", command=self.confirm_sale)
+        self.sell_button.pack(side=tk.LEFT, anchor='e', padx=10, pady=5)
 
         self.sort_order = {"name": False, "price": False, "change": False}
 
+        # 내가 산 주식 Treeview 생성
+        self.my_stocks_treeview = ttk.Treeview(self.my_stocks_frame, columns=("name", "quantity"), show="headings")
+        self.my_stocks_treeview.heading("name", text="Name")
+        self.my_stocks_treeview.heading("quantity", text="Quantity")
+
+        self.my_stocks_treeview.column("name", width=100, anchor='center')
+        self.my_stocks_treeview.column("quantity", width=100, anchor='center')
+
+        self.my_stocks_treeview.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
         # 주식 가격 변동 스레드 시작
         self.update_prices()
+        self.update_my_stocks()
 
     def sort_column(self, col, reverse):
         l = [(self.treeview.set(k, col), k) for k in self.treeview.get_children('')]
@@ -142,13 +169,39 @@ class StockApp(tk.Tk):
             stock_price = float(item_values[1])
             total_price = stock_price * quantity
 
-            if messagebox.askyesno("구매 확인", f"{stock_name} 주식을 {quantity}개 구매하시겠습니까?\n총 가격: {total_price:.2f}"):
-                self.player['money'] -= total_price
-                if stock_name in self.player['stocks']:
-                    self.player['stocks'][stock_name] += quantity
-                else:
-                    self.player['stocks'][stock_name] = quantity
-                messagebox.showinfo("구매 완료", "구매가 완료되었습니다.")
+            if self.player['money'] >= total_price:
+                if messagebox.askyesno("구매 확인", f"{stock_name} 주식을 {quantity}개 구매하시겠습니까?\n총 가격: {total_price:.2f}"):
+                    self.player['money'] -= total_price
+                    if stock_name in self.player['stocks']:
+                        self.player['stocks'][stock_name] += quantity
+                    else:
+                        self.player['stocks'][stock_name] = quantity
+                    self.money_label.config(text=f"남은 돈: {self.player['money']:.2f}")
+                    self.update_my_stocks()
+                    messagebox.showinfo("구매 완료", "구매가 완료되었습니다.")
+            else:
+                messagebox.showwarning("잔액 부족", "잔액이 부족합니다.")
+
+    def confirm_sale(self):
+        quantity = self.quantity_var.get()
+        selected_items = self.treeview.selection()
+        if selected_items:
+            item = selected_items[0]
+            item_values = self.treeview.item(item, 'values')
+            stock_name = item_values[0]
+            stock_price = float(item_values[1])
+            total_price = stock_price * quantity
+
+            if stock_name in self.player['stocks'] and self.player['stocks'][stock_name] >= quantity:
+                if messagebox.askyesno("판매 확인", f"{stock_name} 주식을 {quantity}개 판매하시겠습니까?\n총 가격: {total_price:.2f}"):
+                    self.player['money'] += total_price
+                    self.player['stocks'][stock_name] -= quantity
+                    if self.player['stocks'][stock_name] == 0:
+                        del self.player['stocks'][stock_name]
+                    self.money_label.config(text=f"남은 돈: {self.player['money']:.2f}")
+                    messagebox.showinfo("판매 완료", "판매가 완료되었습니다.")
+            else:
+                messagebox.showwarning("주식 부족", "판매할 주식이 부족합니다.")
 
     def save_game(self):
         os.makedirs('./db/Save', exist_ok=True)

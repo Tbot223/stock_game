@@ -1,0 +1,122 @@
+[
+    {
+        "name": "AAPL",
+        "price": 189.99
+    },
+    {
+        "name": "NFLX",
+        "price": 649.0
+    },
+    {
+        "name": "AMZN",
+        "price": 182.15
+    },
+    {
+        "name": "GOOG",
+        "price": 176.4
+    },
+    {
+        "name": "NVDA",
+        "price": 1139.01
+    },
+    {
+        "name": "TSLA",
+        "price": 176.75
+    },
+    {
+        "name": "MSFT",
+        "price": 245.0
+    },
+    {
+        "name": "FB",
+        "price": 300.4
+    },
+    {
+        "name": "BABA",
+        "price": 265.0
+    },
+    {
+        "name": "TSM",
+        "price": 80.5
+    },
+    {
+        "name": "V",
+        "price": 200.1
+    },
+    {
+        "name": "JPM",
+        "price": 150.2
+    },
+    {
+        "name": "MA",
+        "price": 330.15
+    },
+    {
+        "name": "PG",
+        "price": 140.55
+    },
+    {
+        "name": "INTC",
+        "price": 60.1
+    },
+    {
+        "name": "VZ",
+        "price": 55.9
+    },
+    {
+        "name": "HD",
+        "price": 280.0
+    },
+    {
+        "name": "DIS",
+        "price": 180.4
+    },
+    {
+        "name": "ADBE",
+        "price": 500.1
+    },
+    {
+        "name": "CRM",
+        "price": 240.0
+    },
+    {
+        "name": "KO",
+        "price": 50.3
+    },
+    {
+        "name": "MRK",
+        "price": 80.5
+    },
+    {
+        "name": "NKE",
+        "price": 140.7
+    },
+    {
+        "name": "PEP",
+        "price": 140.3
+    },
+    {
+        "name": "PFE",
+        "price": 40.0
+    },
+    {
+        "name": "NFLX",
+        "price": 650.0
+    },
+    {
+        "name": "ABT",
+        "price": 110.0
+    },
+    {
+        "name": "ACN",
+        "price": 250.0
+    },
+    {
+        "name": "TXN",
+        "price": 180.0
+    },
+    {
+        "name": "QCOM",
+        "price": 140.0
+    }
+]
