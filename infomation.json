@@ -1,0 +1,24 @@
+{
+    "player":[
+        {
+            "name":"admin",
+            "password":"sihuniemi",
+            "level":5
+        },
+        {
+            "name":"Pakyoungjea",
+            "password":"jangea",
+            "level":2
+        },
+        {
+            "name":"kimsihun",
+            "password":"nieamijangin",
+            "level":2
+        },
+        {
+            "name":"backjongheung",
+            "password":"bungsinseaki",
+            "level":2
+        }
+    ]
+}

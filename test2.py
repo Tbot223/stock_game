@@ -1,39 +1,46 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox
+import json
 
-def check_login():
-    # 사용자 이름과 비밀번호를 하드코딩하여 비교
-    username = entry_username.get()
-    password = entry_password.get()
+path = "./infomation.json"
 
-    if username == "admin" and password == "password":
-        print("로그인 성공!")
+def show_success_message():
+    success_window = tk.Tk()
+    success_window.title("성공")
+    success_label = tk.Label(success_window, text="로그인에 성공했습니다!")
+    success_label.pack()
+    success_window.mainloop()
+
+def check_credentials():
+    with open(path, "r") as json_file:
+        json_data = json.load(json_file)
+
+    json_player = json_data["player"]
+    
+    for i in json_player:
+        if username_entry.get() == i["name"] and password_entry.get() == i["password"]:
+            messagebox.showinfo("로그인 성공", "환영합니다!")
+            root.destroy()  # 로그인 창을 닫습니다.
+            show_success_message()
     else:
-        print("로그인 실패!")
+        messagebox.showerror("로그인 실패", "잘못된 사용자 이름 또는 비밀번호입니다.")
 
-# Tkinter 창 생성
 root = tk.Tk()
-style = ttk.Style()
-style.configure('My.TButton', font=('Helvetica', 12, 'bold'), foreground='blue')
-root.title("로그인")
+root.title("로그인 창")
 
-# 사용자 이름 입력 필드
-label_username = tk.Label(root, text="사용자 이름:")
-label_username.pack()
-entry_username = tk.Entry(root)
-entry_username.pack()
+username_label = tk.Label(root, text="사용자 이름:")
+username_label.pack()
 
-# 비밀번호 입력 필드
-label_password = tk.Label(root, text="비밀번호:")
-label_password.pack()
-entry_password = tk.Entry(root, show="*")
-entry_password.pack()
+username_entry = tk.Entry(root)
+username_entry.pack()
 
-# 로그인 버튼
-button_login = ttk.Button(root, text="로그인", command=check_login, style='My.TButton')
-button_login.pack()
-button_sing_up = tk.Button(root, text="가입")
-button_login.grid(row = 0,column=1)
-button_sing_up.pack()
+password_label = tk.Label(root, text="비밀번호:")
+password_label.pack()
+
+password_entry = tk.Entry(root, show="*")
+password_entry.pack()
+
+login_button = tk.Button(root, text="로그인", command=check_credentials)
+login_button.pack()
 
 root.mainloop()
