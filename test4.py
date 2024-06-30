@@ -215,7 +215,7 @@ class StockApp(tk.Tk):
     def update_prices(self):
         for item in self.treeview.get_children():
             current_price = float(self.treeview.set(item, "price"))
-            new_price = current_price * (1 + random.uniform(-0.05, 0.05))  # ±5% 변동
+            new_price = current_price * (1 + random.uniform(-0.1, 0.1))  # ±5% 변동
             change = "▲" if new_price > current_price else "▼"
             color = "red" if new_price > current_price else "blue"
             self.treeview.set(item, "price", f"{new_price:.2f}")
@@ -225,6 +225,11 @@ class StockApp(tk.Tk):
 
         # 10초마다 가격 업데이트
         self.after(10000, self.update_prices)
+    
+    def update_my_stocks(self):
+        self.my_stocks_treeview.delete(*self.my_stocks_treeview.get_children())
+        for stock, quantity in self.player['stocks'].items():
+            self.my_stocks_treeview.insert('', 'end', values=(stock, quantity))
 
 class StartApp(tk.Tk):
     def __init__(self):

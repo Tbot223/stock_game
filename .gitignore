@@ -153,3 +153,5 @@ cython_debug/
 db/AutoSave/Player.json
 .vscode/launch.json
 db/Save/player.json
+db/Save/player.json
+/db/Save
