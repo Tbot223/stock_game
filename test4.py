@@ -199,6 +199,7 @@ class StockApp(tk.Tk):
                     if self.player['stocks'][stock_name] == 0:
                         del self.player['stocks'][stock_name]
                     self.money_label.config(text=f"남은 돈: {self.player['money']:.2f}")
+                    self.update_my_stocks()  # <--- Add this line
                     messagebox.showinfo("판매 완료", "판매가 완료되었습니다.")
             else:
                 messagebox.showwarning("주식 부족", "판매할 주식이 부족합니다.")
