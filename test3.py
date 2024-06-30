@@ -1,43 +1,34 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-import json
-
-# JSON 파일을 읽습니다.
-with open('stocks.json', 'r') as f:
-    stocks = json.load(f)
+from tkinter import ttk
 
 root = tk.Tk()
-tree = ttk.Treeview(root)
-root.title("주식 정보")
+root.title("Treeview Example")
 
-# Treeview를 생성합니다.
-treeview = ttk.Treeview(root, columns=("name", "price", "change"), show="headings")
-treeview.heading("name", text="Name")
-treeview.heading("price", text="Price")
-treeview.heading("change", text="change")
+# 스타일 정의
+style = ttk.Style()
+style.configure("Treeview", rowheight=25)
+style.map("Treeview", background=[("selected", "blue")])
 
-treeview.column("name", width=100, anchor='center')
-treeview.column("price", width=100, anchor='center')
-treeview.column("change", width=50, anchor='center')
+# Treeview 생성
+tree = ttk.Treeview(root, columns=("column1", "column2"), show="headings")
+tree.heading("column1", text="Column 1")
+tree.heading("column2", text="Column 2")
 
-# 각 주식에 대한 정보를 Treeview에 추가합니다.
-for i, stock in enumerate(stocks):
-    stock_name = stock['name']
-    stock_price = stock['price']
-    treeview.insert('', 'end', values=(stock_name, stock_price))
+# 데이터 삽입
+for i in range(10):
+    tree.insert("", "end", values=(f"Item {i+1}", f"Value {i+1}"))
 
-    # 홀수 번째 항목의 배경색을 변경합니다.
-    if i % 2:
-        treeview.tag_configure('oddrow', background='orange')
-        treeview.item(treeview.get_children()[-1], tags=('oddrow',))
+# Treeview 배치
+tree.pack(fill="both", expand=True)
 
-def on_double_click(event):
-    item = treeview.selection()[0]  # 선택된 항목의 ID를 가져옵니다.
-    item_text = treeview.item(item, 'values')[0]  # 선택된 항목의 'name' 값을 가져옵니다.
-    messagebox.showinfo("Item Selected", item_text)  # 메시지 박스에 선택된 항목의 텍스트를 표시합니다.
+# 열과 행 사이에 선 넣기
+tree.tag_configure("evenrow", background="lightblue")
+tree.tag_configure("oddrow", background="white")
 
-treeview.bind("<Double-1>", on_double_click)  # 더블 클릭 이벤트를 바인드합니다.
-
-treeview.pack()
+for i in range(len(tree.get_children())):
+    if i % 2 == 0:
+        tree.item(tree.get_children()[i], tags=("evenrow",))
+    else:
+        tree.item(tree.get_children()[i], tags=("oddrow",))
 
 root.mainloop()

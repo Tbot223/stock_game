@@ -24,6 +24,9 @@ class StockApp(tk.Tk):
         self.stocks = stocks
         self.player = player
 
+        # 게임 일시정지 플래그
+        self.is_paused = False
+
         # 메뉴바 생성
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -33,6 +36,8 @@ class StockApp(tk.Tk):
         menubar.add_cascade(label="게임", menu=game_menu)
         game_menu.add_command(label="게임 저장", command=self.save_game)
         game_menu.add_command(label="게임 종료", command=self.quit_game)
+        game_menu.add_command(label="게임 일시정지", command=self.stop_prices)
+        game_menu.add_command(label="게임 재개", command=self.start_prices)
 
         # Notebook (탭) 생성
         self.notebook = ttk.Notebook(self)
@@ -46,19 +51,20 @@ class StockApp(tk.Tk):
         self.my_stocks_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.my_stocks_frame, text="내가 산 주식")
 
-        # 뉴스 탭
-        self.news_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.news_frame, text="뉴스")
-
         # Treeview를 생성합니다.
-        self.treeview = ttk.Treeview(self.stock_frame, columns=("name", "price", "change"), show="headings")
+        self.treeview = ttk.Treeview(self.stock_frame, columns=("name", "price", "change", "pct_change", "abs_change"), show="headings")
         self.treeview.heading("name", text="Name", command=lambda: self.sort_column("name", False))
         self.treeview.heading("price", text="Price", command=lambda: self.sort_column("price", False))
         self.treeview.heading("change", text="Change", command=lambda: self.sort_column("change", False))
+        self.treeview.heading("pct_change", text="Pct Change", command=lambda: self.sort_column("pct_change", False))
+        self.treeview.heading("abs_change", text="Abs Change", command=lambda: self.sort_column("abs_change", False))
+
 
         self.treeview.column("name", width=100, anchor='center')
         self.treeview.column("price", width=100, anchor='center')
-        self.treeview.column("change", width=100, anchor='center')
+        self.treeview.column("change", width=40, anchor='center')
+        self.treeview.column("pct_change", width=40, anchor='center')
+        self.treeview.column("abs_change", width=40, anchor='center')
 
         # 각 주식에 대한 정보를 Treeview에 추가합니다.
         for i, stock in enumerate(self.stocks):
@@ -131,7 +137,9 @@ class StockApp(tk.Tk):
         l = [(self.treeview.set(k, col), k) for k in self.treeview.get_children('')]
         
         # 숫자 열을 정렬할 때는 숫자로 변환
-        if col in ["price", "change"]:
+        if col == "pct_change":
+            l.sort(key=lambda t: float(t[0].rstrip('%')) if t[0] else 0, reverse=reverse)
+        elif col in ["price", "abs_change"]:
             l.sort(key=lambda t: float(t[0]) if t[0] else 0, reverse=reverse)
         else:
             l.sort(reverse=reverse)
@@ -213,19 +221,33 @@ class StockApp(tk.Tk):
     def quit_game(self):
         self.quit()
 
-    def update_prices(self):
-        for item in self.treeview.get_children():
-            current_price = float(self.treeview.set(item, "price"))
-            new_price = current_price * (1 + random.uniform(-0.1, 0.1))  # ±5% 변동
-            change = "▲" if new_price > current_price else "▼"
-            color = "red" if new_price > current_price else "blue"
-            self.treeview.set(item, "price", f"{new_price:.2f}")
-            self.treeview.set(item, "change", change)
-            self.treeview.tag_configure(item, foreground=color)
-            self.treeview.item(item, tags=(item,))
+    def stop_prices(self):
+        self.is_paused = True
 
-        # 10초마다 가격 업데이트
+    def start_prices(self):
+        self.is_paused = False
+        self.update_prices()
+
+    def update_prices(self):
+        if not self.is_paused:
+            for item in self.treeview.get_children():
+                current_price = float(self.treeview.set(item, "price"))
+                new_price = current_price * (1 + random.uniform(-0.1, 0.1))  # ±5% variation
+                change = "▲" if new_price > current_price else "▼"
+                pct_change = f"{(new_price / current_price - 1) * 100:.2f}%"
+                abs_change = f"{new_price - current_price:.2f}"
+                color = "red" if new_price > current_price else "blue"
+                self.treeview.set(item, "price", f"{new_price:.2f}")
+                self.treeview.set(item, "change", change)
+                self.treeview.set(item, "pct_change", pct_change)
+                self.treeview.set(item, "abs_change", abs_change)
+                self.treeview.tag_configure(item, foreground=color)
+                self.treeview.item(item, tags=(item,))
+
         self.after(10000, self.update_prices)
+
+        # 5초마다 가격 업데이트
+        self.after(5000, self.update_prices)
     
     def update_my_stocks(self):
         self.my_stocks_treeview.delete(*self.my_stocks_treeview.get_children())
