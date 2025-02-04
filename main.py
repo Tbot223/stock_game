@@ -232,7 +232,7 @@ class StockApp(tk.Tk):
         if not self.is_paused:
             for item in self.treeview.get_children():
                 current_price = float(self.treeview.set(item, "price"))
-                new_price = current_price * (1 + random.uniform(-0.1, 0.1))  # ±10% variation
+                new_price = current_price * (1 + random.uniform(-0.025, 0.025))  # ±10% variation
                 change = "▲" if new_price > current_price else "▼"
                 pct_change = f"{(new_price / current_price - 1) * 100:.2f}%"
                 abs_change = f"{new_price - current_price:.2f}"
