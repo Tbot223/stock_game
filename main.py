@@ -244,8 +244,6 @@ class StockApp(tk.Tk):
                 self.treeview.tag_configure(item, foreground=color)
                 self.treeview.item(item, tags=(item,))
 
-        self.after(10000, self.update_prices)
-
         # 5초마다 가격 업데이트
         self.after(5000, self.update_prices)
     
